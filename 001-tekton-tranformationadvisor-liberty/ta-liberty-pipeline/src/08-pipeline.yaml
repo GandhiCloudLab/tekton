@@ -1,0 +1,50 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: ta-liberty-pipeline-pipeline
+  namespace: ta-liberty-pipeline-pro
+spec:
+  resources:
+    - name: git-source
+      type: git
+    - name: docker-image
+      type: image
+  params:  
+    - name: pathToDockerFile
+      description: Path to Dockerfile
+      default: /workspace/git-repo/Dockerfile
+    - name: pathToContext
+      description: The build context used by Kaniko
+      default: /workspace/git-repo
+    - name: pathToDeploymentFiles
+      description: kubectl yaml files
+      default: /workspace/git-repo/operator
+  tasks:
+    - name: task-build-docker-image
+      taskRef:
+        name: build-docker-image
+      params:
+        - name: pathToDockerFile
+          value: "$(params.pathToDockerFile)"
+        - name: pathToContext
+          value: "$(params.pathToContext)"
+      resources:
+        inputs:
+          - name: git-repo
+            resource: git-source
+        outputs:
+          - name: image-registry
+            resource: docker-image
+    - name: task-deploy-using-kubectl
+      runAfter: [task-build-docker-image]  
+      taskRef:
+        name: deploy-using-kubectl
+      params:
+        - name: pathToDeploymentFiles
+          value: "$(params.pathToDeploymentFiles)"
+      resources:
+        inputs:
+          - name: git-repo
+            resource: git-source
+          - name: image-registry
+            resource: docker-image

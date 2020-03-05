@@ -1,0 +1,14 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineRun
+metadata:
+  name: tekton-cart-pipeline-run-01
+spec:
+  pipelineRef:
+    name: tekton-cart-pipeline
+  resources:
+    - name: git-repo
+      resourceRef:
+        name: git-repo
+    - name: image-registry
+      resourceRef:
+        name: image-registry

@@ -1,0 +1,54 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: deploy-using-kubectl
+  namespace: ta-liberty-pipeline-pro
+spec:
+  inputs:
+    resources:
+      - name: git-repo
+        type: git
+      - name: image-registry
+        type: image    
+    params:
+      - name: pathToDeploymentFiles
+        description: Path to deployment yaml files
+        default: /workspace/git-repo/operator/
+  steps:
+    - name: update-image-name-in-yaml
+      image: ubuntu
+      command: 
+      - /bin/bash
+      args:
+        - -c
+        - |
+          echo "Started ......"
+          
+          VALUE0="$(inputs.resources.image-registry.url)"
+          VALUE1="    repository: ${VALUE0%%:*}"
+          VALUE2="    tag: ${VALUE0##*:}"
+          PATH_TO_DEPLOYMENT_FILES="$(inputs.params.pathToDeploymentFiles)/application/application-cr.yaml"
+          
+          echo "Image name extraced : $VALUE1"
+          echo "Image tag extraced : $VALUE2"
+          echo "PATH_TO_DEPLOYMENT_FILES : $PATH_TO_DEPLOYMENT_FILES"
+
+          echo "file before update......"
+          cat "$PATH_TO_DEPLOYMENT_FILES"
+
+          sed -i "s#.*repository:.*#$VALUE1#g" $PATH_TO_DEPLOYMENT_FILES
+          sed -i "s#.*tag:.*#$VALUE2#g" $PATH_TO_DEPLOYMENT_FILES
+          
+          echo "file after update......"
+          cat "$PATH_TO_DEPLOYMENT_FILES"
+
+          echo "Completed ......" 
+    - name: kubectl-apply-deployment-files
+      image: lachlanevenson/k8s-kubectl
+      command: ["kubectl"]
+      args:
+        - "apply"
+        - "-f"
+        - "$(inputs.params.pathToDeploymentFiles)"
+        - "-R"
+        - "--validate=false"

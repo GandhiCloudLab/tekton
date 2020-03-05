@@ -1,0 +1,59 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: build-docker-image
+spec:
+  inputs:
+    resources:
+      - name: git-repo
+        type: git
+    params:
+      - name: pathToDockerFile
+        description: Path to Dockerfile
+        default: /workspace/git-repo/001-tekton-sample/Dockerfile
+      - name: pathToContext
+        description: The build context used by Kaniko
+        default: /workspace/git-repo/001-tekton-sample
+  outputs:
+    resources:
+      - name: image-registry
+        type: image
+  steps:
+    - name: build-and-push
+      image: gcr.io/kaniko-project/executor:v0.10.0
+      env:
+        - name: "DOCKER_CONFIG"
+          value: "/builder/home/.docker/"
+      command:
+        - /kaniko/executor
+      args:
+        - --dockerfile=${inputs.params.pathToDockerFile}
+        - --destination=${outputs.resources.image-registry.url}
+        - --context=${inputs.params.pathToContext}
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: tekton-cart-pipeline
+spec:
+  resources:
+    - name: git-repo
+      type: git
+    - name: image-registry
+      type: image
+  tasks:
+    - name: build-docker-image
+      taskRef:
+        name: build-docker-image
+      params:
+        - name: pathToDockerFile
+          value: /workspace/git-repo/001-tekton-sample/Dockerfile
+        - name: pathToContext
+          value: /workspace/git-repo/001-tekton-sample
+      resources:
+        inputs:
+          - name: git-repo
+            resource: git-repo
+        outputs:
+          - name: image-registry
+            resource: image-registry

@@ -1,0 +1,7 @@
+  
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ta-liberty-pipeline-pro
+  labels:
+    app: ta-liberty-pipeline-app
