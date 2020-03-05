@@ -1,27 +1,25 @@
-# Installing Tekton Pipeline for Transformation Advisor generated Liberty Artifacts
+# Installing Tekton Pipeline for Transformation Advisor generated Liberty App
 
-TA generates migration artifacts (`liberty operator manifest files`, `dockerfile`, pom.xml and etc) to deploy the assessed app in Kubernetes platform.
+TA generates migration artifacts (`liberty operator manifest files`, `Dockerfile`, pom.xml and etc) to deploy the assessed app in Kubernetes platform.
 
-Using Tekton, we build docker image with the TA generated artifacts and deploy the app in RedHat Openshift Container Platform. To do that the below resources are created and available in this repo.
+Using Tekton Pipeline, we build docker image with the TA generated Liberty App artifacts and deploy the app in RedHat Openshift Container Platform. To do that the below resources are created and available in this repo.
 1. Pipeline
 2. Task
 3. Secret
 4. ServiceAccount
 5. ClusterRole
 
-Here `Task` contains steps to create docker image and push it to Docker Registry and deploy in Openshift. These resources are fully customized for TA generated Liberty artifacts.
+Here `Task` contains steps to create docker image,  push it to Docker Registry and deploy in Openshift. These resources are fully customized for TA generated Liberty app artifacts.
 
 These resources are installed in Openshift as a Tekton pipeline. 
 
-Then webhook in the Tekton to be created to link this Pipeline with the GIT repo installed pipeline can be used to deploy any number of apps (TA generated).
-
-Then this Tekton pipeline can be associated in every webhook that we create in Tekton.
+Then this Tekton pipeline can be used in every webhook that we create in Tekton for TA generated apps.
 
 Lets install the pipeline and understand its resources.
 
 ## Prerequisites
 
-* Cloud Pak for Applications v4.x installed on Openshift cluster v4.2 (make sure that Tekton is installed)
+* Cloud Pak for Applications v4.x installed on Openshift cluster v4.2 (make sure Tekton is installed)
 * oc CLI
 
 ## Installing Tekton pipeline `ta-liberty-pipeline`
