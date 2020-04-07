@@ -82,7 +82,7 @@ The artifacts are being send to GIT
 
 Here we are going to use the custom tekton pipeline created in the namespace `ta-liberty-pipeline-pro`. You don't need to install if it is already installed.
 
-To install the pipeline you can refer the link [Installing ta-liberty-pipeline](https://github.com/GandhiCloud/tekton/tree/master/001-tekton-tranformationadvisor-liberty/ta-liberty-pipeline)
+To install the pipeline you can refer the link [Installing ta-liberty-pipeline](https://github.com/GandhiCloudLab/tekton/tree/master/001-tekton-tranformationadvisor-liberty/ta-liberty-pipeline)
 
 #### 2. Open Add Webhook page
 
